@@ -4,7 +4,7 @@ from utility.utils import log_response,LOG_TYPE_PEXEL
 
 PEXELS_API_KEY = os.environ.get('PEXELS_KEY')
 
-def search_videos(query_string, orientation_landscape=True):
+def search_videos(query_string, orientation_landscape=False):
    
     url = "https://api.pexels.com/videos/search"
     headers = {
@@ -14,7 +14,7 @@ def search_videos(query_string, orientation_landscape=True):
     params = {
         "query": query_string,
         "orientation": "landscape" if orientation_landscape else "portrait",
-        "per_page": 15
+        "per_page": 8
     }
 
     response = requests.get(url, headers=headers, params=params)
@@ -24,15 +24,16 @@ def search_videos(query_string, orientation_landscape=True):
     return json_data
 
 
-def getBestVideo(query_string, orientation_landscape=True, used_vids=[]):
+def getBestVideo(query_string, orientation_landscape=False, used_vids=[]):
     vids = search_videos(query_string, orientation_landscape)
+    print(vids)
     videos = vids['videos']  # Extract the videos list from JSON
 
     # Filter and extract videos with width and height as 1920x1080 for landscape or 1080x1920 for portrait
     if orientation_landscape:
         filtered_videos = [video for video in videos if video['width'] >= 1920 and video['height'] >= 1080 and video['width']/video['height'] == 16/9]
     else:
-        filtered_videos = [video for video in videos if video['width'] >= 1080 and video['height'] >= 1920 and video['height']/video['width'] == 16/9]
+        filtered_videos = [video for video in videos if video['width'] >= 1080 and video['height'] >= 1920 and video['height']/video['width'] == 16/9] # was 16/9
 
     # Sort the filtered videos by duration in ascending order
     sorted_videos = sorted(filtered_videos, key=lambda x: abs(15-int(x['duration'])))
@@ -60,7 +61,7 @@ def generate_video_url(timed_video_searches,video_server):
                 url = ""
                 for query in search_terms:
                   
-                    url = getBestVideo(query, orientation_landscape=True, used_vids=used_links)
+                    url = getBestVideo(query, orientation_landscape=False, used_vids=used_links)
                     if url:
                         used_links.append(url.split('.hd')[0])
                         break

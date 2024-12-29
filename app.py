@@ -11,6 +11,19 @@ from utility.video.background_video_generator import generate_video_url
 from utility.render.render_engine import get_output_media
 from utility.video.video_search_query_generator import getVideoSearchQueriesTimed, merge_empty_intervals
 import argparse
+from moviepy.editor import VideoFileClip, AudioFileClip
+
+# Paths to input files
+video_path = "rendered_video.mp4"  # Replace with the path to your .mp4 file
+audio_path = "audio_tts.wav"  # Replace with the path to your .wav file
+output_path = "combined.mp4"  # Replace with the desired output file path
+
+def combine_audio(vidname, audname, outname, fps=25):
+    import moviepy.editor as mpe
+    my_clip = mpe.VideoFileClip(vidname)
+    audio_background = mpe.AudioFileClip(audname)
+    final_clip = my_clip.set_audio(audio_background)
+    final_clip.write_videofile(outname,fps=fps)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate a video from a topic.")
@@ -46,3 +59,6 @@ if __name__ == "__main__":
         print(video)
     else:
         print("No video")
+
+    combine_audio(video_path, audio_path, output_path)
+
